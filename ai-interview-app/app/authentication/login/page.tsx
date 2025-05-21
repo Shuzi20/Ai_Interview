@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,27 +28,26 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Save tokens to localStorage
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh);
-        alert("Login successful!");
+        setMessage("Login successful!");
 
-        // TODO: Redirect to dashboard if needed
-        // router.push('/dashboard')
+        setTimeout(() => {
+          setMessage("");
+          router.push("/dashboard"); // ✅ Change to your desired route
+        }, 2000);
       } else {
-        alert(data.error || "Login failed");
+        setMessage(data.error || "Login failed");
       }
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      setMessage("Something went wrong. Please try again.");
       console.error("Login error:", error);
     }
   };
 
-
   return (
     <div className="h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
       <div className="flex w-full max-w-6xl h-[90%] bg-[#eadcf7] px-12 gap-x-12">
-
         {/* Left Section */}
         <div className="w-1/2 flex flex-col justify-center items-center text-center">
           <div className="max-w-sm">
@@ -56,12 +60,15 @@ export default function LoginPage() {
           </div>
         </div>
 
-
-
-        {/* Right Section - Form Card */}
+        {/* Right Section */}
         <div className="w-1/2 flex justify-center items-center">
-           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-            <h2 className="text-2xl text-gray-800 font-bold text-center mb-6">LOGIN</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-2xl text-gray-800 font-bold text-center mb-4">LOGIN</h2>
+            {message && (
+              <div className="text-center text-green-600 font-medium mb-4">
+                {message}
+              </div>
+            )}
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Email</label>
@@ -71,19 +78,27 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-2 border rounded-md text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Password</label>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border rounded-md text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                  >
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </span>
+                </div>
               </div>
               <button
                 type="submit"
@@ -116,7 +131,7 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   );
