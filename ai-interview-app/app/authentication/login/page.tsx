@@ -8,10 +8,37 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging in with", email, password);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save tokens to localStorage
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+        alert("Login successful!");
+
+        // TODO: Redirect to dashboard if needed
+        // router.push('/dashboard')
+      } else {
+        alert(data.error || "Login failed");
+      }
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
+      console.error("Login error:", error);
+    }
   };
+
 
   return (
     <div className="h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">

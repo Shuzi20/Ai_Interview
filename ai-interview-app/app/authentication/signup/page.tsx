@@ -10,9 +10,29 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async(e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Registering:", { firstName, lastName, email, password });
+
+    const response = await fetch("http://localhost:8000/api/register/", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
+        }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        alert("Signup successful");
+    } else {
+        alert(data.error || "Signup failed");
+    }
   };
 
   return (
