@@ -14,15 +14,40 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validatePassword = (pwd: string): string => {
+    if (pwd.length < 8 || pwd.length > 16) {
+      return "Password must be 8–16 characters long.";
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return "Password must include at least one uppercase letter.";
+    }
+    if (!/[a-z]/.test(pwd)) {
+      return "Password must include at least one lowercase letter.";
+    }
+    if (!/\d/.test(pwd)) {
+      return "Password must include at least one digit.";
+    }
+    if (!/[^A-Za-z0-9]/.test(pwd)) {
+      return "Password must include at least one special character.";
+    }
+    return "";
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setEmailError("");
+    setPasswordError("");
+
+    const pwdError = validatePassword(password);
+    setPasswordError(pwdError);
+    if (pwdError) return;
 
     const response = await fetch("http://localhost:8000/api/register/", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         first_name: firstName,
         last_name: lastName,
@@ -37,10 +62,14 @@ export default function SignupPage() {
       setMessage("Signup successful!");
       setTimeout(() => {
         setMessage("");
-        router.push("/dashboard"); // ✅ Change this to your desired route
+        router.push("/dashboard"); // ✅ Change as needed
       }, 2000);
     } else {
-      setMessage(data.error || "Signup failed");
+      if (data.error === "User already exists.") {
+        setEmailError("This email is already registered.");
+      } else {
+        setMessage(data.error || "Signup failed");
+      }
     }
   };
 
@@ -79,6 +108,7 @@ export default function SignupPage() {
                   className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
                 />
               </div>
+
               {/* Last Name */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Last Name</label>
@@ -91,6 +121,7 @@ export default function SignupPage() {
                   className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
                 />
               </div>
+
               {/* Email */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Email</label>
@@ -102,7 +133,11 @@ export default function SignupPage() {
                   required
                   className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
                 />
+                {emailError && (
+                  <p className="text-sm text-red-600 mt-1">{emailError}</p>
+                )}
               </div>
+
               {/* Password */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Password</label>
@@ -122,6 +157,9 @@ export default function SignupPage() {
                     {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </span>
                 </div>
+                {passwordError && (
+                  <p className="text-sm text-red-600 mt-1">{passwordError}</p>
+                )}
               </div>
 
               <button
