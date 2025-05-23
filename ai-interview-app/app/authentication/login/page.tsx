@@ -1,5 +1,5 @@
 "use client";
-
+import { signIn } from "next-auth/react"; 
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -131,11 +131,13 @@ export default function LoginPage() {
             {/* Google Login */}
             <button
               type="button"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition"
             >
               <FcGoogle size={20} />
               <span className="text-gray-700">Continue with Google</span>
             </button>
+
 
             <p className="text-sm text-center mt-4 text-gray-600">
               Don’t have an account?{" "}
