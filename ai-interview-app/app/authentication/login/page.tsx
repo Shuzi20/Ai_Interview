@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false); // ✅ NEW
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,23 +31,40 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh);
+        setIsError(false);
         setMessage("Login successful!");
 
         setTimeout(() => {
           setMessage("");
-          router.push("/dashboard"); // ✅ Change to your desired route
+          router.push("/dashboard");
         }, 2000);
       } else {
+        setIsError(true);
         setMessage(data.error || "Login failed");
+        setTimeout(() => setMessage(""), 2000); // auto-clear error
       }
     } catch (error) {
+      setIsError(true);
       setMessage("Something went wrong. Please try again.");
       console.error("Login error:", error);
+      setTimeout(() => setMessage(""), 2000);
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+    <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+
+      {/* ✅ Top-Center Floating Message */}
+      {message && (
+        <div
+          className={`absolute top-5 left-1/2 -translate-x-1/2 px-6 py-2 rounded-lg shadow-md text-base font-medium z-50 transition-all duration-300
+            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}
+          `}
+        >
+          {message}
+        </div>
+      )}
+
       <div className="flex w-full max-w-6xl h-[90%] bg-[#eadcf7] px-12 gap-x-12">
         {/* Left Section */}
         <div className="w-1/2 flex flex-col justify-center items-center text-center">
@@ -64,11 +82,6 @@ export default function LoginPage() {
         <div className="w-1/2 flex justify-center items-center">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
             <h2 className="text-2xl text-gray-800 font-bold text-center mb-4">LOGIN</h2>
-            {message && (
-              <div className="text-center text-green-600 font-medium mb-4">
-                {message}
-              </div>
-            )}
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Email</label>

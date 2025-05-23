@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
 
@@ -59,22 +60,37 @@ export default function SignupPage() {
     const data = await response.json();
 
     if (response.ok) {
+      setIsError(false);
       setMessage("Signup successful!");
       setTimeout(() => {
         setMessage("");
-        router.push("/dashboard"); // ✅ Change as needed
+        router.push("/dashboard");
       }, 2000);
     } else {
       if (data.error === "User already exists.") {
         setEmailError("This email is already registered.");
       } else {
+        setIsError(true);
         setMessage(data.error || "Signup failed");
+        setTimeout(() => setMessage(""), 2000);
       }
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+    <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+      
+      {/* ✅ Top-Center Floating Message */}
+      {message && (
+        <div
+          className={`absolute top-5 left-1/2 -translate-x-1/2 px-6 py-2 rounded-lg shadow-md text-base font-medium z-50 transition-all duration-300
+            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}
+          `}
+        >
+          {message}
+        </div>
+      )}
+
       <div className="flex w-full max-w-6xl h-[90%] bg-[#eadcf7] px-12 gap-x-12">
         {/* Left Branding Section */}
         <div className="w-1/2 flex flex-col justify-center items-center text-center">
@@ -89,12 +105,10 @@ export default function SignupPage() {
         </div>
 
         {/* Right Form Section */}
-        <div className="w-1/2 flex justify-center items-center">
+        <div className="w-1/2 flex flex-col justify-start items-center pt-3 relative">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">REGISTER</h2>
-            {message && (
-              <div className="text-center text-green-600 font-medium mb-4">{message}</div>
-            )}
+
             <form onSubmit={handleRegister} className="space-y-4">
               {/* First Name */}
               <div>
