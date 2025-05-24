@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import GoogleAuthSync from "@/components/GoogleAuthSync"; // ✅ NEW
 
 export default function LoginPage() {
   const router = useRouter();
@@ -53,6 +54,8 @@ export default function LoginPage() {
 
   return (
     <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+      {/* ✅ Google Auth Sync */}
+      <GoogleAuthSync />
 
       {/* ✅ Top-Center Floating Message */}
       {message && (

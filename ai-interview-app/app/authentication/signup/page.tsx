@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import GoogleAuthSync from "@/components/GoogleAuthSync";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -80,6 +81,8 @@ export default function SignupPage() {
 
   return (
     <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
+      {/* ✅ Google Auth Sync */}
+      <GoogleAuthSync />
       
       {/* ✅ Top-Center Floating Message */}
       {message && (
