@@ -2,6 +2,18 @@
 
 from django.db import migrations
 
+def create_job_roles(apps, schema_editor):
+    JobRole = apps.get_model('accounts', 'JobRole')
+    JobRole.objects.bulk_create([
+        JobRole(title='Software Engineer', icon='💻'),
+        JobRole(title='Data Analyst', icon='📊'),
+        JobRole(title='Product Manager', icon='🧭'),
+        JobRole(title='AI Researcher', icon='🧠'),
+        JobRole(title='Backend Developer', icon='🛠️'),
+        JobRole(title='DevOps Engineer', icon='⚙️'),
+        JobRole(title='Frontend Developer', icon='🖥️'),
+        JobRole(title='UX Designer', icon='🎨'),
+    ])
 
 class Migration(migrations.Migration):
 
@@ -10,4 +22,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+         migrations.RunPython(create_job_roles),
     ]
