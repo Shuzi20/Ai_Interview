@@ -22,10 +22,13 @@ export default function RoleSelection() {
   }, []);
 
   const handleSubmit = async () => {
-    if (!selectedRole) return alert('Select a role first.');
+    if (!selectedRole && !resume) {
+      alert('Please select a role or upload a resume to start the interview.');
+      return;
+    }
 
     const formData = new FormData();
-    formData.append('role', selectedRole.toString());
+    if (selectedRole) formData.append('role', selectedRole.toString());
     if (resume) formData.append('resume', resume);
 
     try {
@@ -44,6 +47,7 @@ export default function RoleSelection() {
       alert('Something went wrong while starting the interview.');
     }
   };
+
 
   return (
     <div className="min-h-screen bg-purple-100 p-6 flex flex-col items-center justify-center">

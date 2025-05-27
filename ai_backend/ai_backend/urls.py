@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from accounts.views import RegisterView, LoginView, GoogleAuthView
-from accounts.jobrole_selection import roles
+from accounts.jobrole_selection import roles, start_interview
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,11 @@ urlpatterns = [
     path('api/login/', LoginView.as_view()),
     path('api/register-google-user/', GoogleAuthView.as_view()),
     path('api/roles/', roles.get_roles, name='get_roles'),
+    path('api/start-interview/', start_interview.start_interview),
 ]
+
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
