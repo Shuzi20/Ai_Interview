@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from accounts.views import RegisterView, LoginView, GoogleAuthView
 from accounts.jobrole_selection import roles, start_interview
+from accounts.admin import adminapi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +27,7 @@ urlpatterns = [
     path('api/register-google-user/', GoogleAuthView.as_view()),
     path('api/roles/', roles.get_roles, name='get_roles'),
     path('api/start-interview/', start_interview.start_interview),
+    path('api/generate-questions/', adminapi.generate_ai_questions),
 ]
 
 

@@ -19,3 +19,31 @@ class InterviewSession(models.Model):
 
     def __str__(self):
         return f"Interview #{self.id} - {self.user.username} - {self.role.title if self.role else 'No Role'}"
+
+
+class InterviewQuestion(models.Model):
+    role = models.ForeignKey(JobRole, on_delete=models.CASCADE)
+    question_text = models.TextField()
+    ideal_answer = models.TextField(blank=True)  # Optional, used for BERT scoring
+
+    def __str__(self):
+        return f"Q: {self.question_text[:60]}"
+
+class InterviewAnswer(models.Model):
+    session = models.ForeignKey('InterviewSession', on_delete=models.CASCADE)
+    question = models.ForeignKey(InterviewQuestion, on_delete=models.CASCADE)
+    answer_text = models.TextField()
+    score = models.FloatField(null=True, blank=True)
+    feedback = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Answer by {self.session.user.username} - Q#{self.question.id}"
+
+
+class AIQuestionSuggestion(models.Model):
+    role = models.ForeignKey(JobRole, on_delete=models.CASCADE)
+    question_text = models.TextField()
+    approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Suggested Q: {self.question_text[:60]}"
