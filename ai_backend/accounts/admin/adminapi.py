@@ -16,3 +16,5 @@ def generate_ai_questions(request):
             return JsonResponse({'questions': questions}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
+
