@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/roles/', roles.get_roles, name='get_roles'),
     path('api/start-interview/', start_interview.start_interview),
     path('api/generate-questions/', adminapi.generate_ai_questions),
+    path('api/save-approved-questions/', adminapi.save_approved_questions),
 ]
 
 
