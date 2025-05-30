@@ -7,7 +7,7 @@ type Question = {
   question_text: string;
 };
 
-export default function InterviewPage() {
+export default function QuestionsPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -45,7 +45,18 @@ export default function InterviewPage() {
         alert("Camera and mic permission is required.");
       }
     };
+
     getMedia();
+
+    // ✅ Cleanup when navigating away or unmounting
+    return () => {
+      if (videoRef.current?.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
+      setStream(null);
+    };
   }, []);
 
   const startRecording = () => {
@@ -85,9 +96,18 @@ export default function InterviewPage() {
 
   const handleNext = () => {
     stopRecording();
+
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
+      // ✅ Stop camera & mic fully at the end
+      if (videoRef.current?.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
+      setStream(null);
+
       router.push(`/interview/${id}/summary`);
     }
   };

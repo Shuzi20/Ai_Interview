@@ -41,7 +41,7 @@ export default function RoleSelection() {
 
       const data = await response.json();
       const interviewId = data.interview_id;
-      router.push(`/interview/${interviewId}`);
+      router.push(`/interview/${interviewId}/questions`);
     } catch (error) {
       console.error('Error starting interview:', error);
       alert('Something went wrong while starting the interview.');

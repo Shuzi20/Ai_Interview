@@ -20,8 +20,8 @@ from accounts.views import RegisterView, LoginView, GoogleAuthView
 from accounts.jobrole_selection import roles, start_interview
 from accounts.admin import adminapi
 from accounts.interview import fetch_questions
-from accounts.interview import submit_answer
-
+from accounts.interview import submit_media_answers
+from accounts.interview import interview_summary
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,7 +33,8 @@ urlpatterns = [
     path('api/generate-questions/', adminapi.generate_ai_questions),
     path('api/save-approved-questions/', adminapi.save_approved_questions),
     path('api/interview/<int:interview_id>/questions/', fetch_questions.get_interview_questions),
-    path('api/submit-answer/', submit_answer.submit_answer),
+    path("api/submit-media-answer/", submit_media_answers.submit_media_answer),
+    path("api/interview/<int:interview_id>/summary/", interview_summary.interview_summary),
 ]
 
 

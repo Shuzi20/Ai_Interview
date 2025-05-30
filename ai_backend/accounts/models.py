@@ -31,14 +31,14 @@ class InterviewQuestion(models.Model):
 
 class InterviewAnswer(models.Model):
     session = models.ForeignKey('InterviewSession', on_delete=models.CASCADE)
-    question = models.ForeignKey(InterviewQuestion, on_delete=models.CASCADE)
-    answer_text = models.TextField()
+    question = models.ForeignKey('InterviewQuestion', on_delete=models.CASCADE)
     score = models.FloatField(null=True, blank=True)
     feedback = models.TextField(blank=True)
+    video_file = models.FileField(upload_to='answers/videos/', null=True, blank=True)  # ✅ Add this
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Answer by {self.session.user.username} - Q#{self.question.id}"
-
 
 class AIQuestionSuggestion(models.Model):
     role = models.ForeignKey(JobRole, on_delete=models.CASCADE)
