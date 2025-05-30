@@ -10,18 +10,15 @@ def start_interview(request):
         resume = request.FILES.get('resume')
         user = request.user if request.user.is_authenticated else User.objects.first()
 
-        if not role_id and not resume:
-            return JsonResponse({'error': 'Please provide a role or upload a resume.'}, status=400)
+        if not role_id:
+            return JsonResponse({'error': 'Role is required.'}, status=400)
 
-        role = None
-        if role_id:
-            try:
-                role = JobRole.objects.get(id=role_id)
-            except JobRole.DoesNotExist:
-                return JsonResponse({'error': 'Invalid role'}, status=404)
+        try:
+            role = JobRole.objects.get(id=role_id)
+        except JobRole.DoesNotExist:
+            return JsonResponse({'error': 'Invalid role ID'}, status=404)
 
         interview = InterviewSession.objects.create(user=user, role=role, resume=resume)
         return JsonResponse({'interview_id': interview.id}, status=201)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
-

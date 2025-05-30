@@ -19,6 +19,9 @@ from django.urls import path
 from accounts.views import RegisterView, LoginView, GoogleAuthView
 from accounts.jobrole_selection import roles, start_interview
 from accounts.admin import adminapi
+from accounts.interview import fetch_questions
+from accounts.interview import submit_answer
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +32,8 @@ urlpatterns = [
     path('api/start-interview/', start_interview.start_interview),
     path('api/generate-questions/', adminapi.generate_ai_questions),
     path('api/save-approved-questions/', adminapi.save_approved_questions),
+    path('api/interview/<int:interview_id>/questions/', fetch_questions.get_interview_questions),
+    path('api/submit-answer/', submit_answer.submit_answer),
 ]
 
 
