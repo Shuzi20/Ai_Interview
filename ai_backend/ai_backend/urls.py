@@ -22,6 +22,8 @@ from accounts.admin import adminapi
 from accounts.interview import fetch_questions
 from accounts.interview import submit_media_answers
 from accounts.interview import interview_summary
+from accounts.admin.view_interview import list_interviews
+from accounts.admin.interview_details import interview_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +37,8 @@ urlpatterns = [
     path('api/interview/<int:interview_id>/questions/', fetch_questions.get_interview_questions),
     path("api/submit-media-answer/", submit_media_answers.submit_media_answer),
     path("api/interview/<int:interview_id>/summary/", interview_summary.interview_summary),
+    path("api/admin/interviews/", list_interviews),
+    path("api/admin/interviews/<int:interview_id>/", interview_detail),
 ]
 
 
