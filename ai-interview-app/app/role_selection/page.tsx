@@ -1,13 +1,30 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  MdCode, MdBarChart, MdOutlineAssignment, MdBrush,
+  MdSettings, MdPieChart, MdSmartToy, MdSecurity
+} from "react-icons/md";
 
 type Role = {
   id: number;
   title: string;
   icon: string;
 };
+
+const iconMap: Record<string, React.ReactNode> = {
+  code: <MdCode size={28} />,
+  bar_chart: <MdBarChart size={28} />,
+  clipboard_list: <MdOutlineAssignment size={28} />,
+  brush: <MdBrush size={28} />,
+  settings: <MdSettings size={28} />,
+  pie_chart: <MdPieChart size={28} />,
+  robot: <MdSmartToy size={28} />,
+  shield: <MdSecurity size={28} />,
+};
+
 
 export default function RoleSelection() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -48,7 +65,6 @@ export default function RoleSelection() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-purple-100 p-6 flex flex-col items-center justify-center">
       <h1 className="text-4xl font-extrabold text-purple-700 mb-2">Choose Your Role</h1>
@@ -66,7 +82,7 @@ export default function RoleSelection() {
             }`}
           >
             <div className="flex items-center justify-center w-14 h-14 rounded-full bg-purple-50 mx-auto mb-4 text-2xl">
-              {role.icon}
+              {iconMap[role.icon] || <MdCode size={28} />}
             </div>
             <div className="font-semibold text-lg">{role.title}</div>
           </div>

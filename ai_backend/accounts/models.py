@@ -1,6 +1,7 @@
 # accounts/models.py
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
 #JobRole model to represent different job roles
 class JobRole(models.Model):
@@ -9,10 +10,22 @@ class JobRole(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = (
+        ('candidate', 'Candidate'),
+        ('admin', 'Admin'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='candidate')
+
+    def __str__(self):
+        return f"{self.username} ({self.role})"
+
 
 # InterviewSession model to represent an interview session
 class InterviewSession(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     role = models.ForeignKey(JobRole, on_delete=models.CASCADE, null=True, blank=True)  # ✅ allow null
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     started_at = models.DateTimeField(auto_now_add=True)
