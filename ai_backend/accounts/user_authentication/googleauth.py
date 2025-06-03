@@ -11,7 +11,7 @@ class GoogleAuthView(APIView):
         email = request.data.get('email')
         name = request.data.get('name', '')
         image = request.data.get('image', '')
-        role = request.data.get('role', 'candidate')  # Default role for Google users
+        role = request.data.get('role', 'candidate')  # Default to candidate
 
         if not email:
             return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -29,6 +29,11 @@ class GoogleAuthView(APIView):
                 "role": role
             }
         )
+
+        # ✅ Update role if existing user has a different one
+        if not created and user.role != role:
+            user.role = role
+            user.save()
 
         return Response({
             "message": "Google user synced successfully",

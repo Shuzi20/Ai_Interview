@@ -7,7 +7,8 @@ export default function ChooseRolePage() {
   const router = useRouter();
 
   const handleSelect = (role: "candidate" | "admin") => {
-    router.push(`/authentication/signup?role=${role}`);
+    localStorage.setItem("role", role); // ✅ Store role before auth
+    router.push("/authentication/signup");
   };
 
   return (

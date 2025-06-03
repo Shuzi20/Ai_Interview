@@ -1,3 +1,5 @@
+// app/authentication/signup/page.tsx
+
 "use client";
 
 import { signIn } from 'next-auth/react';
@@ -6,7 +8,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import GoogleAuthSync from "@/components/GoogleAuthSync";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,21 +22,11 @@ export default function SignupPage() {
   const [emailError, setEmailError] = useState("");
 
   const validatePassword = (pwd: string): string => {
-    if (pwd.length < 8 || pwd.length > 16) {
-      return "Password must be 8–16 characters long.";
-    }
-    if (!/[A-Z]/.test(pwd)) {
-      return "Password must include at least one uppercase letter.";
-    }
-    if (!/[a-z]/.test(pwd)) {
-      return "Password must include at least one lowercase letter.";
-    }
-    if (!/\d/.test(pwd)) {
-      return "Password must include at least one digit.";
-    }
-    if (!/[^A-Za-z0-9]/.test(pwd)) {
-      return "Password must include at least one special character.";
-    }
+    if (pwd.length < 8 || pwd.length > 16) return "Password must be 8–16 characters long.";
+    if (!/[A-Z]/.test(pwd)) return "Password must include at least one uppercase letter.";
+    if (!/[a-z]/.test(pwd)) return "Password must include at least one lowercase letter.";
+    if (!/\d/.test(pwd)) return "Password must include at least one digit.";
+    if (!/[^A-Za-z0-9]/.test(pwd)) return "Password must include at least one special character.";
     return "";
   };
 
@@ -48,6 +39,8 @@ export default function SignupPage() {
     setPasswordError(pwdError);
     if (pwdError) return;
 
+    const role = localStorage.getItem("role") || "candidate"; // ✅ Read selected role
+
     const response = await fetch("http://localhost:8000/api/register/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -56,6 +49,7 @@ export default function SignupPage() {
         last_name: lastName,
         email,
         password,
+        role, // ✅ Send role to backend
       }),
     });
 
@@ -64,10 +58,15 @@ export default function SignupPage() {
     if (response.ok) {
       setIsError(false);
       setMessage("Signup successful!");
+      localStorage.setItem("role", data.role || "candidate");
       setTimeout(() => {
         setMessage("");
-        router.push("/dashboard");
-      }, 2000);
+        if (data.role === "admin") {
+          router.push("/admin/questions");
+        } else {
+          router.push("/role_selection");
+        }
+      }, 1000);
     } else {
       if (data.error === "User already exists.") {
         setEmailError("This email is already registered.");
@@ -81,22 +80,16 @@ export default function SignupPage() {
 
   return (
     <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
-      {/* ✅ Google Auth Sync */}
-      <GoogleAuthSync />
-      
-      {/* ✅ Top-Center Floating Message */}
       {message && (
         <div
           className={`absolute top-5 left-1/2 -translate-x-1/2 px-6 py-2 rounded-lg shadow-md text-base font-medium z-50 transition-all duration-300
-            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}
-          `}
+            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}`}
         >
           {message}
         </div>
       )}
 
       <div className="flex w-full max-w-6xl h-[90%] bg-[#eadcf7] px-12 gap-x-12">
-        {/* Left Branding Section */}
         <div className="w-1/2 flex flex-col justify-center items-center text-center">
           <div className="max-w-sm">
             <h1 className="text-[65px] font-normal text-[#521283] leading-none whitespace-nowrap font-roboto">
@@ -108,13 +101,11 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Right Form Section */}
         <div className="w-1/2 flex flex-col justify-start items-center pt-3 relative">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">REGISTER</h2>
 
             <form onSubmit={handleRegister} className="space-y-4">
-              {/* First Name */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">First Name</label>
                 <input
@@ -127,7 +118,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              {/* Last Name */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Last Name</label>
                 <input
@@ -140,7 +130,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Email</label>
                 <input
@@ -151,12 +140,9 @@ export default function SignupPage() {
                   required
                   className="w-full px-4 py-2 border rounded-md text-gray-600 placeholder:text-gray-300 focus:outline-none border-gray-300 focus:ring-2 focus:ring-purple-500"
                 />
-                {emailError && (
-                  <p className="text-sm text-red-600 mt-1">{emailError}</p>
-                )}
+                {emailError && <p className="text-sm text-red-600 mt-1">{emailError}</p>}
               </div>
 
-              {/* Password */}
               <div>
                 <label className="block text-sm text-gray-800 mb-1">Password</label>
                 <div className="relative">
@@ -175,9 +161,7 @@ export default function SignupPage() {
                     {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </span>
                 </div>
-                {passwordError && (
-                  <p className="text-sm text-red-600 mt-1">{passwordError}</p>
-                )}
+                {passwordError && <p className="text-sm text-red-600 mt-1">{passwordError}</p>}
               </div>
 
               <button
@@ -188,26 +172,23 @@ export default function SignupPage() {
               </button>
             </form>
 
-            {/* OR Separator */}
             <div className="flex items-center my-4">
               <div className="flex-grow h-px bg-gray-300"></div>
               <span className="px-3 text-gray-500 text-sm">OR</span>
               <div className="flex-grow h-px bg-gray-300"></div>
             </div>
 
-            {/* Google Auth */}
             <button
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/google-callback" })}
               className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition"
             >
               <FcGoogle size={20} />
               <span className="text-gray-700">Continue with Google</span>
             </button>
 
-
             <p className="text-sm text-center mt-4 text-gray-600">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link href="/authentication/login" className="text-purple-600 hover:underline">
                 Login
               </Link>

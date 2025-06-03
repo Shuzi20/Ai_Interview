@@ -10,7 +10,7 @@ class RegisterView(APIView):
         password = request.data.get('password')
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
-        role = request.data.get('role', 'candidate')  # default to 'candidate'
+        role = request.data.get('role', 'candidate')
 
         if not email or not password or not first_name or not last_name:
             return Response({"error": "All fields are required."}, status=400)
@@ -29,6 +29,10 @@ class RegisterView(APIView):
 
         if CustomUser.objects.filter(username=email).exists():
             return Response({"error": "User already exists."}, status=400)
+
+        # Prevent unauthorized creation of admin accounts directly via form
+        if role == 'admin':
+            return Response({"error": "Admin registration is not allowed via this form."}, status=403)
 
         user = CustomUser.objects.create_user(
             username=email,

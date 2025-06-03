@@ -1,3 +1,5 @@
+// app/authentication/login/page.tsx
+
 "use client";
 import { signIn } from "next-auth/react"; 
 import { useState } from "react";
@@ -5,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import GoogleAuthSync from "@/components/GoogleAuthSync"; // ✅ NEW
+import GoogleAuthSync from "@/components/GoogleAuthSync";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,7 +15,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false); // ✅ NEW
+  const [isError, setIsError] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +23,7 @@ export default function LoginPage() {
     try {
       const response = await fetch("http://localhost:8000/api/login/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -32,17 +32,24 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("accessToken", data.access);
         localStorage.setItem("refreshToken", data.refresh);
+        localStorage.setItem("role", data.user.role);
         setIsError(false);
         setMessage("Login successful!");
 
         setTimeout(() => {
           setMessage("");
-          router.push("/dashboard");
-        }, 2000);
+          if (data.user.role === "candidate") {
+            router.push("/role_selection");
+          } else if (data.user.role === "admin") {
+            router.push("/admin/questions");
+          } else {
+            router.push("/");
+          }
+        }, 1000);
       } else {
         setIsError(true);
         setMessage(data.error || "Login failed");
-        setTimeout(() => setMessage(""), 2000); // auto-clear error
+        setTimeout(() => setMessage(""), 2000);
       }
     } catch (error) {
       setIsError(true);
@@ -54,22 +61,18 @@ export default function LoginPage() {
 
   return (
     <div className="relative h-screen flex items-center justify-center bg-[#eadcf7] font-roboto">
-      {/* ✅ Google Auth Sync */}
-      <GoogleAuthSync />
+      
 
-      {/* ✅ Top-Center Floating Message */}
       {message && (
         <div
           className={`absolute top-5 left-1/2 -translate-x-1/2 px-6 py-2 rounded-lg shadow-md text-base font-medium z-50 transition-all duration-300
-            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}
-          `}
+            ${isError ? "bg-red-100 text-red-700" : "bg-purple-100 text-purple-800"}`}
         >
           {message}
         </div>
       )}
 
       <div className="flex w-full max-w-6xl h-[90%] bg-[#eadcf7] px-12 gap-x-12">
-        {/* Left Section */}
         <div className="w-1/2 flex flex-col justify-center items-center text-center">
           <div className="max-w-sm">
             <h1 className="text-[65px] font-normal text-[#521283] leading-none whitespace-nowrap font-roboto">
@@ -81,7 +84,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Section */}
         <div className="w-1/2 flex justify-center items-center">
           <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
             <h2 className="text-2xl text-gray-800 font-bold text-center mb-4">LOGIN</h2>
@@ -124,23 +126,20 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* OR Separator */}
             <div className="flex items-center my-4">
               <div className="flex-grow h-px bg-gray-300"></div>
               <span className="px-3 text-gray-500 text-sm">OR</span>
               <div className="flex-grow h-px bg-gray-300"></div>
             </div>
 
-            {/* Google Login */}
             <button
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/google-callback" })}
               className="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition"
             >
               <FcGoogle size={20} />
               <span className="text-gray-700">Continue with Google</span>
             </button>
-
 
             <p className="text-sm text-center mt-4 text-gray-600">
               Don’t have an account?{" "}
